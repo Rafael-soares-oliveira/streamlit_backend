@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      part:
+        description: "Qual parte da versão atualizar? (patch, minor, major)"
+        required: true
+        default: "patch"
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configurar GIT
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      - name: Instalar bump-my-version
+        run: pip install bump-my-version
+      - name: Executar Bump
+        run: bump-my-version bump ${{ github.event.inputs.part }}
+      - name: Push das alterações
+        run: git push --follow-tags

@@ -1,0 +1,22 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Hatch
+        run: pip install hatch
+      - name: Rodar testes e gerar coverage
+        run: hatch run pytest
+      - name: Gerar badges
+        run: hatch run genbadge coverage -i coverage.xml -o coverage-badge.svg
+      - name: Upload dos artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios
+          path: |
+            htmlcov/
+            junit/test-results.xml
