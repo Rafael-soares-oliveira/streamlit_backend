@@ -8,13 +8,16 @@ on:
         required: true
         default: "patch"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       
@@ -24,7 +27,7 @@ jobs:
           git config user.email "actions@github.com"
       
       - name: Instalar uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       
       - name: Calcular Nova Versão e Atualizar Arquivos
         run: |
