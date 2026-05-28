@@ -26,13 +26,12 @@ jobs:
       - name: Instalar uv
         uses: astral-sh/setup-uv@v5
       
-      - name: Calcular e Criar Nova Tag
+      - name: Calcular Nova Versão e Atualizar Arquivos
         run: |
           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           VERSION=${VERSION#v}
-
+          
           IFS='.' read -r major minor patch <<< "$VERSION"
-
           if [ "${{ github.event.inputs.part }}" = "major" ]; then
             new_version="$((major + 1)).0.0"
           elif [ "${{ github.event.inputs.part }}" = "minor" ]; then
@@ -40,7 +39,14 @@ jobs:
           else
             new_version="${major}.${minor}.$((patch + 1))"
           fi
-
+          
           echo "Nova versão: v$new_version"
+          
+          # Atualiza o README.md via sed antes de criar a tag
+          sed -i "s/Versão atual: .*/Versão atual: $new_version/g" README.md
+          
+          git add README.md
+          git commit -m "chore: bump version para v$new_version [skip ci]" || echo "Sem mudanças no README"
+          
           git tag -a "v$new_version" -m "Release v$new_version"
-          git push origin "v$new_version"
+          git push origin main --follow-tags

@@ -44,9 +44,8 @@ source = "vcs"
 [tool.hatch.version.raw-options]
 local_scheme = "no-local-version"
 
-[[tool.hatch.build.hooks.vcs.version-file]]
-path = "README.md"
-pattern = "Versão atual: {version}"
+[tool.hatch.build.hooks.vcs]
+version-file = "src/_version.py"
 
 [tool.ruff.format]
 docstring-code-format = true
