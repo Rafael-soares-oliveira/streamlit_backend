@@ -1,6 +1,7 @@
 # Modern Data Stack in a Box - Streamlit Backend
 
-[![Powered by Kedro](https://img.shields.io/badge/Powered_by-Kedro-ffc900?logo=Kedro)](https://kedro.org)
+Versão atual: 0.0.0
+
 [![Python](https://img.shields.io/badge/Python-3.13%2B-blue?logo=Python)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Docker-green?logo=Postgresql)](https://www.postgresql.org/)
 [![Streamlit UI](https://img.shields.io/badge/Streamlit-Docker-green?logo=Streamlit)](https://docs.streamlit.io/)
@@ -12,7 +13,7 @@
 ![Coverage](./coverage.svg)
 
 ## Visao geral
-Backend modular para analytics interno com foco em produtividade do Administrador. O projeto padroniza autenticacao, bootstrap de DuckDB, telemetria e contratos de ML para que novos dashboards possam ser construidos sem reimplementar infraestrutura.
+Backend modular para analytics interno com foco em produtividade do Administrador. O projeto padroniza autenticação, bootstrap de DuckDB, telemetria e contratos de ML para que novos dashboards possam ser construidos sem reconstruir a infraestrutura.
 
 ## Stack
 - Streamlit
@@ -35,6 +36,7 @@ streamlit_backend/
 │   ├── telemetry/
 │   └── transformations/
 ├── tests/
+├── .streamlit/
 ├── data/
 ├── pyproject.toml
 └── README.md
