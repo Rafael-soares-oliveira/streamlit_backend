@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 import streamlit as st
 
-from src.auth.service import (
+from auth.service import (
     AuthenticatedUser,
     _credentials_from_secrets,
     _fallback_credentials,
@@ -11,7 +11,7 @@ from src.auth.service import (
     get_authenticator,
     login,
 )
-from src.config.settings import Settings
+from config.settings import Settings
 
 
 def test_can_access_admin_true_for_admin_role() -> None:
@@ -48,8 +48,8 @@ def test_fallback_credentials() -> None:
     assert credentials["usernames"]["user"]["password"] == "user_hash"  # noqa: S105
 
 
-@patch("src.auth.service._credentials_from_secrets")
-@patch("src.auth.service.stauth.Authenticate")
+@patch("auth.service._credentials_from_secrets")
+@patch("auth.service.stauth.Authenticate")
 def test_get_authenticator(
     mock_authenticate: MagicMock, mock_from_secrets: MagicMock
 ) -> None:

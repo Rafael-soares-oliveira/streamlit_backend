@@ -3,20 +3,20 @@ from unittest.mock import patch
 import pytest
 import streamlit as st
 
-from src.app import main
-from src.auth.service import AuthenticatedUser
+from app import main
+from auth.service import AuthenticatedUser
 
 
 @pytest.fixture(autouse=True)
 def mock_app_dependencies():
     """Mocka todas as dependências globais e de infraestrutura do app."""
     with (
-        patch("src.app.get_settings") as mock_settings,
-        patch("src.app.ensure_duckdb_bootstrap") as mock_bootstrap,
-        patch("src.app.log_message_event") as mock_log,
-        patch("src.app.get_authenticator") as mock_auth_obj,
-        patch("src.app._credentials_from_secrets", return_value={"usernames": {}}),
-        patch("src.app._fallback_credentials", return_value={}),
+        patch("app.get_settings") as mock_settings,
+        patch("app.ensure_duckdb_bootstrap") as mock_bootstrap,
+        patch("app.log_message_event") as mock_log,
+        patch("app.get_authenticator") as mock_auth_obj,
+        patch("app._credentials_from_secrets", return_value={"usernames": {}}),
+        patch("app._fallback_credentials", return_value={}),
         patch.object(st, "secrets", {}),
         patch.object(st, "set_page_config"),
         patch.object(st, "title"),
@@ -35,7 +35,7 @@ def mock_app_dependencies():
 def test_main_user_not_authenticated() -> None:
     """Se o login retornar None, o app deve parar imediatamente."""
     with (
-        patch("src.app.login", return_value=None) as mock_login,
+        patch("app.login", return_value=None) as mock_login,
         patch.object(st, "sidebar") as mock_sidebar,
     ):
         main()
@@ -49,12 +49,10 @@ def test_main_user_login_regular_role() -> None:
     regular_user = AuthenticatedUser(name="User", username="user1", role="user")
 
     with (
-        patch("src.app.login", return_value=regular_user),
+        patch("app.login", return_value=regular_user),
         patch.object(st.sidebar, "radio", return_value="Exploracao") as mock_radio,
         patch.object(st.sidebar, "write"),
-        patch(
-            "src.pages.exploration.render"
-        ) as mock_render,  # Evita executar o render real
+        patch("app.exploration.render") as mock_render,  # Evita executar o render real
     ):
         main()
 
@@ -71,13 +69,13 @@ def test_main_user_login_admin_role() -> None:
     admin_user = AuthenticatedUser(name="Admin", username="admin1", role="admin")
 
     with (
-        patch("src.app.login", return_value=admin_user),
+        patch("app.login", return_value=admin_user),
         patch.object(st.sidebar, "radio", return_value="Admin") as mock_radio,
         patch.object(st.sidebar, "write"),
-        patch("src.pages.admin.render") as mock_render,  # Evita executar o render real
+        patch("app.admin.render") as mock_render,  # Evita executar o render real
     ):
         main()
-
+        mock_radio.assert_called_once()
         called_pages = mock_radio.call_args[0][1]
         assert "Admin" in called_pages
         mock_render.assert_called_once()

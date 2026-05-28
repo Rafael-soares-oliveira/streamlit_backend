@@ -19,8 +19,7 @@ def _credentials_from_secrets() -> dict:
     if auth_section is None:
         return {}
 
-    auth_dict = auth_section.to_dict()
-    return auth_dict.get("credentials", {})
+    return auth_section.get("credentials", {})
 
 
 def _fallback_credentials() -> dict:
