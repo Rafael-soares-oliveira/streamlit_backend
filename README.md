@@ -1,6 +1,6 @@
 # Modern Data Stack in a Box - Streamlit Backend
 
-Versão atual: 0.0.0
+Versão atual: 0.0.1
 
 [![Python](https://img.shields.io/badge/Python-3.13%2B-blue?logo=Python)](https://www.python.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Docker-green?logo=Postgresql)](https://www.postgresql.org/)
