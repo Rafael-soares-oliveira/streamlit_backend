@@ -1,21 +1,79 @@
-# 📦 Modern Data Stack in a Box - Analytics Platform
+# Modern Data Stack in a Box - Streamlit Backend
 
-## 🎯 Visão Geral
-Plataforma de analytics interna modular, flexível e segura. Este projeto fornece um backend padronizado para ingestão, segurança, telemetria automatizada e governança de dados. O Administrador tem total liberdade para realizar engenharia de dados e modelagem estatística focada no negócio, sem precisar gerenciar a infraestrutura subjacente.
+[![Powered by Kedro](https://img.shields.io/badge/Powered_by-Kedro-ffc900?logo=Kedro)](https://kedro.org)
+[![Python](https://img.shields.io/badge/Python-3.13%2B-blue?logo=Python)](https://www.python.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Docker-green?logo=Postgresql)](https://www.postgresql.org/)
+[![Streamlit UI](https://img.shields.io/badge/Streamlit-Docker-green?logo=Streamlit)](https://docs.streamlit.io/)
 
-## 🏗️ Arquitetura e Stack Tecnológica
-* **Origem (Operacional):** PostgreSQL.
-* **Ingestão (EL):** `dlt` (data load tool) automatiza a extração e carga, lidando com cargas incrementais (Upsert/Append) via `updated_at`.
-* **Motor Analítico & Armazenamento:** DuckDB (Arquivo local `.duckdb` de altíssima performance).
-* **Transformações:** Ibis framework. Permite modelagem de dados em Python que é traduzida nativamente para consultas SQL no DuckDB.
-* **Frontend:** Streamlit.
-* **Segurança:** `streamlit-authenticator` (RBAC, senhas em hash bcrypt).
-* **Observabilidade:** Sistema de telemetria assíncrono via decoradores (`@telemetry`) isolado em tabelas DuckDB (`infra.telemetry_system` e `infra.message_system`).
-* **Governança de ML:** Contratos de dados imutáveis via Dataclasses Python (`ModelResult`).
+[![Ollama](https://img.shields.io/badge/theLook_eCommerce-dataset-blue?logo=GoogleCloud)](https://console.cloud.google.com/marketplace/product/bigquery-public-data/thelook-ecommerce?project=bigquery-484420)
 
-## 🚀 Como Desenvolver (Para Administradores)
-O backend já cuida da infraestrutura. Para criar novos dashboards:
-1. Extraia os dados usando o módulo `src/ingestion/`.
-2. Transforme os dados usando Ibis em `src/transformations/`.
-3. Valide seus modelos de ML importando os contratos em `src/ml_contracts/`.
-4. Crie a interface visual na pasta `src/pages/` e adicione ao `app.py`.
+
+[![CI](https://github.com/Rafael-soares-oliveira/ecommerce_mlops_genai_pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/Rafael-soares-oliveira/ecommerce_mlops_genai_pipeline/actions/workflows/ci.yml)
+![Coverage](./coverage.svg)
+
+## Visao geral
+Backend modular para analytics interno com foco em produtividade do Administrador. O projeto padroniza autenticacao, bootstrap de DuckDB, telemetria e contratos de ML para que novos dashboards possam ser construidos sem reimplementar infraestrutura.
+
+## Stack
+- Streamlit
+- DuckDB
+- Ibis
+- dlt
+- streamlit-authenticator
+- pytest + ruff
+- gerenciamento de ambiente com uv
+
+## Estrutura atual
+```text
+streamlit_backend/
+├── src/
+│   ├── app.py
+│   ├── auth/
+│   ├── config/
+│   ├── ml_contracts/
+│   ├── pages/
+│   ├── telemetry/
+│   └── transformations/
+├── tests/
+├── data/
+├── pyproject.toml
+└── README.md
+```
+
+## Como executar com uv
+1. Instale dependencias:
+   - `uv sync --dev`
+2. Execute o app:
+   - `uv run streamlit run src/app.py`
+3. Rode lint:
+   - `uv run ruff check .`
+   - `uv run ruff format --check .`
+4. Rode testes:
+   - `uv run pytest`
+
+## Autenticacao (MVP)
+- O app usa `streamlit-authenticator`.
+- Configure credenciais em `.streamlit/secrets.toml` sob a chave `auth.credentials`.
+- Como fallback local, hashes podem ser lidos de:
+  - `APP_ADMIN_PASSWORD_HASH`
+  - `APP_USER_PASSWORD_HASH`
+
+## DuckDB e telemetria
+- O banco padrao e `data/analytics.duckdb`.
+- O bootstrap cria automaticamente:
+  - `infra.telemetry_system`
+  - `infra.message_system`
+
+## Contratos de ML
+Contratos tipados em `src/ml_contracts/models.py`:
+- `RegressionMetrics`
+- `ClassificationMetrics`
+- `ClusterMetrics`
+- `ModelResult`
+
+## Proximos passos sugeridos
+- Corrigir página inicial.
+- Melhorar sistema de Login.
+- Implementar pipeline `dlt` incremental PostgreSQL -> DuckDB.
+- Evoluir paginas de exploracao/modelos/admin.
+- Adicionar masking de PII e buffer assincrono para telemetria.

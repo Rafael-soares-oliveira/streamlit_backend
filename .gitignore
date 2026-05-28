@@ -8,3 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Cache
+.pytest_cache
+.ruff_cache
+
+# Secrets
+.streamlit/*
+!streamlit/.gitkeep
+
+# Data
+data/

@@ -21,9 +21,7 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-      - name: Instalar bump-my-version
-        run: pip install bump-my-version
-      - name: Executar Bump
-        run: bump-my-version bump ${{ github.event.inputs.part }}
+      - name: Instalar e Executar Bump
+        run: uvx bump-my-version bump ${{ github.event.inputs.part }}
       - name: Push das alterações
         run: git push --follow-tags

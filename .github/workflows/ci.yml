@@ -1,22 +1,66 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'coverage.svg'
+      - 'README.md'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write # Permite dar push em commits
+  checks: write # Necessário para o Publish JUnit Report
+  pull-requests: write # Se o report de testes comentar no PR
 
 jobs:
-  test:
+  test-and-lint:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Instalar Hatch
-        run: pip install hatch
-      - name: Rodar testes e gerar coverage
-        run: hatch run pytest
-      - name: Gerar badges
-        run: hatch run genbadge coverage -i coverage.xml -o coverage-badge.svg
-      - name: Upload dos artefatos
-        uses: actions/upload-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          name: relatorios
-          path: |
-            htmlcov/
-            junit/test-results.xml
+          enable-cache: true
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: uv sync --all-groups
+
+      - name: Lint with Ruff
+        run: uv run ruff check .
+
+      - name: Type check
+        run: uv run ty check .
+
+      - name: Test with Pytest
+        run: uv run pytest --cov-fail-under=80
+
+      - name: Publish JUnit Report
+        uses: mikepenz/action-junit-report@v4
+        if: success() || failure() # Publica o relatório mesmo se os testes falharem
+        with:
+          report_paths: "**/test-results.xml"
+
+      - name: Upload HTML Coverage Report
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: html-coverage-report
+          path: htmlcov/
+
+      - name: Generate Coverage Badge
+        run: uv run genbadge coverage -i coverage.xml -o coverage.svg
+
+      - name: Commit Badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: atualiza badge de cobertura [skip ci]"
+          file_pattern: coverage.svg
